@@ -1,39 +1,113 @@
 import { useState,useEffect,useRef } from 'react'
 import Navbar from './components/Navbar'
+import { v4 as uuidv4 } from 'uuid';
 
 
 function App() {
-  const handleEdit = ()=>
+  const [todo, setTodo] = useState("")
+const [todos, setTodos] = useState([])
+const [showFinished, setshowFinished] = useState(true)
+const savetoLS=(params) => {
+  localStorage.setItem("todos",JSON.stringify(todos))
+}
+useEffect(() => {
+  let todoString=localStorage.getItem("todos");
+  if(todoString)
   {
-    
+    let todos=JSON.parse(todoString);
+    setTodos(todos);
   }
-  const handleDelete = ()=>
-  {
+}, [])
+const toggleshowFinished=()=>{
+  setshowFinished(!showFinished);
+}
+const handleDelete=(e,id)=>{
+  let newTodos=todos.filter(item=>{
+    return item.id!==id;
+  })
+  setTodos(newTodos);
+  savetoLS();
+}
+const handleEdit=(e,id)=>{
+  let newTodos=[...todos];
+  let idx=todos.findIndex(item=>{
+    return item.id===id;
+  })
+  newTodos[idx].isEdit=!newTodos[idx].isEdit;
+  setTodos(newTodos)
+  savetoLS();
+}
+const handleDone=(e,id)=>{
+  let newTodos=[...todos];
+  let idx=todos.findIndex(item=>{
+    return item.id===id;
+  })
+  // newTodos[idx].isEdit=!newTodos[idx].isEdit;
+  // setTodo(item.todo);
+  newTodos[idx].isEdit=!newTodos[idx].isEdit;
+  setTodos(newTodos);
+  console.log(todos)
+  savetoLS();
+}
+const handleAdd=()=>{
+  setTodos([...todos,{id:uuidv4(),todo, isCompleted:false,isEdit:false}])
+  setTodo("")
+  console.log(todos)
+  savetoLS();
+}
+const handleChange=(e)=>{
+  setTodo(e.target.value);
+}
+const handleEChange=(e,id)=>{
+  let newTodos=[...todos];
+  let idx=todos.findIndex(item=>{
+    return item.id===id;
+  })
+  newTodos[idx].todo=e.target.value;
+  setTodos(newTodos);
+  savetoLS();
+  // setTodo()
 
-  }
-  const handleAdd = ()=>
-  {
+}
 
-  }
+const handleCheckbox=(e)=>{
+  let id=e.target.name;
+  let index=todos.findIndex(item=>{
+    return item.id===id;
+  })
+  let newTodos=[...todos];
+  newTodos[index].isCompleted=!newTodos[index].isCompleted;
+  setTodos(newTodos);
+  savetoLS();
+}
   return (
     <>
     <Navbar/>
-      <div className='container mx-auto bg-violet-200 p-5 rounded-xl min-h-[80vh]'>
+      <div className='container mx-auto bg-violet-200 p-5 rounded-xl min-h-[80vh] w-1/2'>
         <div className="addTodo my-5">
           <h2 className='text-lg font-bold '>Add a Todo</h2>
-          <input type="text" className='bg-amber-50 w-1/2' />
-          <button onClick={handleAdd} className='bg-violet-800 hover:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-6'>Add</button>
+          <input onChange={handleChange} value={todo} type="text" className='bg-amber-50 w-1/2 p-1' />
+          <button onClick={handleAdd} disabled={todo.length<3} className='bg-violet-800 hover:bg-violet-950 disabled:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-6'>Save</button>
         </div>
+        <input type="checkbox" onChange={toggleshowFinished} checked={showFinished} />&nbsp; Show Finished
         <h2 className='text-lg font-bold'>Your Todos</h2>
         <div className="todos">
-          <div className="todo flex">
-            <div className="text">{todo}</div>
-              <div className="buttons">
-                <button onClick={handleEdit()} className='bg-violet-800 hover:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-2'>Edit</button>
-                <button onClick={handleDelete()} className='bg-violet-800 hover:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-2'>Delete</button> 
+          {todos.length===0 && <div className='m-5'>No Todos to display</div>}
+            {todos.map(item=>{
+              return (showFinished || !item.isCompleted) && <div>{item.isEdit?<div key={item.id} className="todoe">
+                <input onChange={(e)=>handleEChange(e,item.id)} value={item.todo??""} type="text" className='bg-amber-50 w-1/2 p-1' />
+                <button onClick={(e)=>handleDone(e,item.id)} className='bg-violet-800 hover:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-6'>Done</button>
+              </div>:<div key={item.id} className="todo flex w-1/2 justify-between my-3">
+                <input onChange={handleCheckbox} name={item.id} type="checkbox" value={item.isCompleted}
+                checked={item.isCompleted} id="" />
+            <div className={item.isCompleted?"line-through":""}>{item.todo}</div>
+              <div className="buttons flex h-full">
+                <button onClick={(e)=>{handleEdit(e,item.id)}} className='bg-violet-800 hover:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-2'>Edit</button>
+                <button onClick={(e)=>{handleDelete(e,item.id)}} className='bg-violet-800 hover:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-2'>Delete</button> 
             </div>
-
-          </div>
+            </div>
+            }</div>
+          })}
         </div>
       </div>
     </>
