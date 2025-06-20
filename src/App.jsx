@@ -84,10 +84,11 @@ const handleCheckbox=(e)=>{
     <>
     <Navbar/>
       <div className='container mx-auto bg-violet-200 p-5 rounded-xl min-h-[80vh] w-1/2'>
-        <div className="addTodo my-5">
+      <h1 className='font-bold text-center text-xl'>iTask - Manage your todos at one place  </h1>
+        <div className="addTodo my-5 flex flex-col gap-4">
           <h2 className='text-lg font-bold '>Add a Todo</h2>
-          <input onChange={handleChange} value={todo} type="text" className='bg-amber-50 w-1/2 p-1' />
-          <button onClick={handleAdd} disabled={todo.length<3} className='bg-violet-800 hover:bg-violet-950 disabled:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md mx-6'>Save</button>
+          <input onChange={handleChange} value={todo} type="text" className='bg-amber-50 w-full px-5 py-2 rounded-full' />
+          <button onClick={handleAdd} disabled={todo.length<3} className='bg-violet-800 hover:bg-violet-950 disabled:bg-violet-950 p-2 py-1 text-sm font-bold text-white rounded-md '>Save</button>
         </div>
         <input type="checkbox" onChange={toggleshowFinished} checked={showFinished} />&nbsp; Show Finished
         <h2 className='text-lg font-bold'>Your Todos</h2>
